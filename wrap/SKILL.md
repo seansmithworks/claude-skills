@@ -71,7 +71,22 @@ Save feedback, decisions, or references that future sessions should know about. 
 
 Done before session notes so notes can reference saved memory files. Skip if nothing non-obvious was learned.
 
-### 5. Orchestrator State (any thread in a project that has an ORCHESTRATOR.md)
+### 5. Idea-Log Review (tease-capture)
+
+Read `~/.claude/projects/-Users-seansmith-Code/memory/tease-capture.md`.
+
+Surface any entries that are new since the last wrap review (the most recent captures at the bottom of the Captures list), so Sean sees what accumulated since he last looked.
+
+Then offer two things, one at a time:
+
+1. **Prune pass** -- flag entries older than ~30 days that have not been acted on (the file's own documented rule). List them and ask Sean whether to remove them. Do not auto-delete.
+2. **Promotion pass** -- for any entry that is a genuine, actionable engineering or design spike (not a content musing, strategy note, or explicitly-parked item), offer to promote it into the relevant project's `todos/` or backlog. One entry at a time, Sean's call. Do not move anything automatically.
+
+This is a review-and-offer step, not an automatic drain. The log spans projects, so keep the review light -- it is one of several optional wrap steps.
+
+Skip if the idea log is empty or all entries were already reviewed in a prior wrap.
+
+### 6. Orchestrator State (any thread in a project that has an ORCHESTRATOR.md)
 
 First, check whether `.claude/projects/<path>/memory/ORCHESTRATOR.md` exists for the current project. If it does, this step applies — regardless of whether this thread is the orchestrator or an implementation thread.
 
@@ -96,15 +111,15 @@ Skip ONLY if the project has no ORCHESTRATOR.md, AND no subagents were delegated
 >
 > **Gotcha:** A session that ends cleanly after shipping a milestone still needs ORCHESTRATOR.md updated — clean endings are not an excuse to skip. The skip is only valid for pure-research or pure-chat sessions where nothing changed.
 
-### 6. Session Notes (L2 — if meaningful work happened)
+### 7. Session Notes (L2 — if meaningful work happened)
 
 Append to `docs/SESSION_NOTES.md` if the session produced commits, decisions, or learnings worth recording. Include commit SHAs from step 2, ticket IDs touched from step 3, references to memory files saved in step 4, and any deferred gaps from step 1.
 
 Quick chat sessions or minor tweaks don't need notes.
 
-### 7. Second Brain (L3 — if project state changed significantly)
+### 8. Second Brain (L3 — if project state changed significantly)
 
-Update the project's thread in Second Brain with current state, what's next, open questions. Use `/secondbrain` or QMD to find/update the thread. This is the narrative arc — summarize the session notes from step 6, don't duplicate them.
+Update the project's thread in Second Brain with current state, what's next, open questions. Use `/secondbrain` or QMD to find/update the thread. This is the narrative arc — summarize the session notes from step 7, don't duplicate them.
 
 Skip for small sessions that don't change the project's trajectory.
 
@@ -113,9 +128,9 @@ Skip for small sessions that don't change the project's trajectory.
 - **Coding-only projects** → Session Notes (git-searchable, co-located with code)
 - **Cross-domain or life projects** → Second Brain thread (QMD-searchable, broader context)
 
-### 8. Final Commit & Push (if steps above created docs)
+### 9. Final Commit & Push (if steps above created docs)
 
-Commit any session notes, memory updates, orchestrator state, or Second Brain changes created in steps 4–7. Push. Separate commit from step 2 so code and documentation commits are distinct in history.
+Commit any session notes, memory updates, orchestrator state, or Second Brain changes created in steps 4–8. Push. Separate commit from step 2 so code and documentation commits are distinct in history.
 
 ## Output Format
 
@@ -155,6 +170,7 @@ After completing selected steps, present the wrap-it-up box and summary table.
   │ Git            │ 3 commits pushed (abc1234..def5678)                                      │
   │ Linear         │ PRJ-12, PRJ-15 → Done                                                    │
   │ Memories       │ 1 feedback saved                                                         │
+  │ Idea Log       │ 3 new captures surfaced; 1 entry flagged for pruning                     │
   │ Orchestrator   │ Updated                                                                  │
   │ Session Notes  │ Updated                                                                  │
   │ Second Brain   │ Skipped — captured in session notes                                      │
