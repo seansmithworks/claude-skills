@@ -69,6 +69,19 @@ The pickup prompt must include:
 
 **3b. Then also copy to clipboard** via `pbcopy`:
 
+**3c. Carried-item form-check (run before finalizing the pickup prompt):**
+
+Before writing the "What's next" section, scan every item you are carrying forward. For each item, assess its form:
+
+- **Concrete strawman form** — item describes something to build or a specific action. Carry forward normally.
+- **Gated-on-input form** — item is phrased as a question, "needs Sean's input", "Phase N", "TBD", or "awaiting decision" without a concrete strawman attached. This is a DROP SIGNAL, not a normal backlog item. Do one of two things:
+  - Build the first-pass strawman now, before writing the pickup prompt, OR
+  - Surface it loudly in the pickup prompt: "carried as a question — decide or kill."
+
+For any item carried forward again (not resolved since the last wrap-continue), stamp it inline: `carried N× since [YYYY-MM-DD]`. This tag lives in the pickup prompt text itself — do not create any separate tracking file. Repeat-carries become visible so they can be decided or killed.
+
+The goal: no gated item should quietly survive another cycle as a question. Either it becomes a strawman or it becomes an explicit decision point.
+
 ```bash
 cat <<'EOF' | pbcopy
 [prompt content here]

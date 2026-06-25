@@ -79,6 +79,8 @@ Update `ORCHESTRATOR.md` with architecture changes, decisions, fragile areas, re
 
 If step 1 deferred any gaps as follow-up tasks, record them in **In-Flight Work** here.
 
+**In-flight form-check:** Any In-Flight item that is gated on input (phrased as a question, "needs Sean," "Phase N," "TBD") rather than carrying a concrete strawman should be flagged inline as "decide or kill." Any item carried forward from a prior session without resolution should be stamped `carried N× since [YYYY-MM-DD]` so repeat-carries are visible. The primary home for this check is `/wrap-continue` Step 3c — apply it here too when writing or updating In-Flight Work.
+
 **This update is mandatory if the project has an ORCHESTRATOR.md AND ANY of the following are true:**
 
 - Any subagent was delegated this session (whether it succeeded or failed)
