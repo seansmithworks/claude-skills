@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fix: Gated Becomes Never</title>
+    <link rel="stylesheet" href="http://localhost:4849/assets/plan.css" />
+    <style>
+      .lever {
+        border: 1px solid var(--border, #ddd);
+        border-radius: 10px;
+        padding: 1rem 1.15rem;
+        margin: 1rem 0;
+      }
+      .lever h3 {
+        margin-top: 0;
+      }
+      .pill {
+        display: inline-block;
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 0.12rem 0.55rem;
+        border-radius: 999px;
+        border: 1px solid currentColor;
+        vertical-align: middle;
+      }
+      .p-keep {
+        color: #1c6b3c;
+      }
+      .p-cut {
+        color: #b3261e;
+      }
+      .p-new {
+        color: #1c4e8a;
+      }
+      .p-reframe {
+        color: #8a6d00;
+      }
+      .ba {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .ba > div {
+        border: 1px solid var(--border, #ddd);
+        border-radius: 10px;
+        padding: 0.9rem 1.1rem;
+      }
+      .ba-w {
+        background: rgba(179, 38, 30, 0.04);
+      }
+      .ba-r {
+        background: rgba(28, 107, 60, 0.05);
+      }
+      @media (max-width: 720px) {
+        .ba {
+          grid-template-columns: 1fr;
+        }
+      }
+      code.path {
+        font-size: 0.85em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Fix: Gated Becomes Never</h1>
+    <p class="doc-meta">
+      claude-skills + ~/.claude global &middot; 2026-06-24 &middot; Status:
+      revised, passed adversarial gate (verdict was "rethink")
+    </p>
+
+    <blockquote class="callout">
+      This is the work-ledger fix, grounded in a forensic trace of a real
+      failure: three feed cards you asked for were never built across three
+      sessions. The trace proved the handoffs worked. The items were not lost.
+      They were <strong>starved by gating</strong>: each needed a design call,
+      so each session parked them as "needs Sean's input" and asked instead of
+      building. With nothing to force the issue, gated quietly became never.
+    </blockquote>
+
+    <h2>1. TL;DR</h2>
+    <p>
+      Two moves, anchored on a pattern you have already proven.
+      <strong>Prevent</strong> the gate (a strawman-by-default rule, promoted
+      from one project's memory to global), and <strong>detect</strong> when
+      prevention fails (a structural check on carried-forward items, wired into
+      the skill that was actually in the failure chain). The detection half
+      mirrors the exact hybrid (prose default plus a harness hook) you already
+      shipped to kill "completion theater."
+    </p>
+
+    <h2>2. What the adversarial pass changed</h2>
+    <p>
+      The refuter read the files I had not, and earned a "rethink." Three
+      corrections reshaped the plan:
+    </p>
+
+    <div class="ba">
+      <div class="ba-w">
+        <h4><span class="pill p-cut">First draft</span></h4>
+        <ul>
+          <li>Consolidate three "cluster" memories into one global rule.</li>
+          <li>
+            Primary backstop = enumerate the session's asks and grep git for
+            evidence each shipped.
+          </li>
+          <li>
+            Put the rule in CLAUDE.md plus a reinforcement pointer in the
+            orchestrator prompt.
+          </li>
+          <li>Deferral counter = probably cut.</li>
+        </ul>
+      </div>
+      <div class="ba-r">
+        <h4><span class="pill p-keep">Revised</span></h4>
+        <ul>
+          <li>
+            Promote <strong>only</strong> the strawman rule. The other two are
+            distinct rules. Link, do not merge.
+          </li>
+          <li>
+            Primary backstop = a deterministic
+            <strong>form-check on carried items</strong>. Git-grep demoted.
+          </li>
+          <li>
+            One home (CLAUDE.md). Cut the pointer (it just creates drift).
+          </li>
+          <li>
+            The carried-item check <em>is</em> the deferral counter, in cheap
+            form.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Refuter finding</th>
+          <th>Verdict</th>
+          <th>What changed</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            Merging the 3 memories deletes 2 distinct rules, re-installs the
+            FOLLOW-UPS.md rot vector globally, and imports an "ask first"
+            contradiction.
+          </td>
+          <td><span class="pill p-keep">Accepted</span></td>
+          <td>
+            Promote only the strawman rule; leave the other two project-local
+            and link them. Confirmed by reading both files.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            The "ask first" instinct is not vague temperament. It is
+            deliberately shipped in your own artifacts (the four-gate memory,
+            the adversarial-plan ask-gate).
+          </td>
+          <td><span class="pill p-keep">Accepted</span></td>
+          <td>
+            The rule is worded as a sharp boundary that <em>refines</em> the
+            existing instinct, not a blanket override.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Git-grep reconciliation gives false confidence: it cannot tell a
+            rejected strawman from the wanted thing, and a parked-as-question
+            session has a clean git log with nothing to flag.
+          </td>
+          <td><span class="pill p-keep">Accepted</span></td>
+          <td>
+            Git-grep demoted to optional secondary. The deterministic form-check
+            becomes primary.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            The backstop was on the wrong skill: re-parking happened at every
+            mid-task recycle (wrap-continue), not end-of-day (wrap).
+          </td>
+          <td><span class="pill p-keep">Accepted</span></td>
+          <td>
+            Form-check is primary in <code>wrap-continue</code>, secondary in
+            <code>wrap</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            No forcing function survives; the fix is as discretionary as what
+            failed. A SessionStart hook is the unused key.
+          </td>
+          <td><span class="pill p-reframe">Partly</span></td>
+          <td>
+            Reframed honestly. No hook can <em>make</em> a model build a
+            strawman. The real forcing function is the structural form-check,
+            hardenable with a tripwire hook that mirrors your shipped
+            <code>ship-quality-gate.sh</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            No acceptance criteria, violating your own evidence-based-done
+            keystone.
+          </td>
+          <td><span class="pill p-keep">Accepted</span></td>
+          <td>Added a validation pass with evidence (section 6).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>3. The anchor: you already solved this once</h2>
+    <p>
+      The strongest part of the revised plan is that it is not new. Your
+      <code>feedback-evidence-based-done</code> memory documents that you hit
+      this exact "discretionary prose does not fire" wall for
+      <strong>completion theater</strong>, and you fixed it with a hybrid:
+    </p>
+    <blockquote class="callout">
+      A prose orchestrator-prompt edit is discretionary firing, NOT enforcement.
+      Only a harness hook fires by default. So <code>ship-quality</code> ships
+      as: callable skill + standing prose default + a real
+      <code>SubagentStop</code> hook (<code class="path"
+        >~/.claude/hooks/ship-quality-gate.sh</code
+      >) that injects the evidence checklist on every subagent return.
+    </blockquote>
+    <p>
+      This plan applies the same shape to gated-never. Prose for the behavioral
+      half (prevention), a harness tripwire for the structural half (detection).
+      Proven pattern, new target.
+    </p>
+
+    <h2>4. The fix</h2>
+
+    <div class="lever">
+      <h3>
+        Lever 1 &mdash; Prevention
+        <span class="pill p-new">promote, do not merge</span>
+      </h3>
+      <p>
+        <strong>Move:</strong> promote only
+        <code>feedback-gated-items-become-never-build-a-strawman</code> from
+        seansmithdesign's memory dir to the global always-loaded surface (<code
+          class="path"
+          >~/.claude/CLAUDE.md</code
+        >). Leave <code>feedback-overnight-autonomy</code> and
+        <code>feedback-evidence-based-done</code> where they are; add
+        <code>[[wikilinks]]</code> so the cluster stays connected.
+      </p>
+      <p>
+        <strong
+          >Wording (draft) &mdash; a sharp boundary, not a blanket
+          override:</strong
+        >
+      </p>
+      <pre><code>When a request needs a design or taste decision (copy, scores, sizing,
+layout), do not park it as a question or a "Phase N / needs input" item.
+Build a concrete first-pass strawman Sean can react to on screen, and
+surface only the one or two genuine forks alongside it. Reserve
+question-rounds for decisions that change what gets built, or for
+irreversible / outward-facing actions. Gating an item on input is how
+requested work silently becomes never-done.</code></pre>
+      <p>
+        <strong>Honest read:</strong> this is best-effort prose. Placement
+        (global, always loaded) and the sharp wording are the leverage, but a
+        single line will not always beat a deeply trained, separately reinforced
+        "ask first" default. That is precisely why Lever 2 exists and does not
+        depend on this firing.
+      </p>
+    </div>
+
+    <div class="lever">
+      <h3>
+        Lever 2 &mdash; Detection (the real backstop)
+        <span class="pill p-new">replaces git-grep</span>
+      </h3>
+      <p>
+        <strong>Move:</strong> a structural
+        <strong>form-check on carried-forward items</strong>. At handoff, before
+        finalizing the pickup prompt, scan each carried item. Any item that is
+        <em>gated on input</em> (phrased as a question, "needs Sean," "Phase N,"
+        "TBD") rather than carrying a strawman is itself the drop signal. Either
+        build the strawman now, or surface it loudly: "carried as a question
+        &mdash; decide or kill." Stamp a
+        <code>carried Nx since [date]</code> tag in the carry text so
+        repeat-carries are visible. No separate file (files rot, per the dead
+        FOLLOW-UPS.md); the tag lives in the pickup prompt and ORCHESTRATOR.md
+        In-Flight.
+      </p>
+      <p>
+        <strong>Why this beats git-grep:</strong> it inspects a small, present
+        artifact (the carry list), not the whole transcript. It needs no
+        semantic enumeration of "what Sean asked for" &mdash; the same judgment
+        that failed three sessions running. It keys on the <em>form</em> of the
+        item, which is exactly what the failure looked like.
+      </p>
+      <p>
+        <strong>Where:</strong> primary in
+        <code class="path">claude-skills/wrap-continue/SKILL.md</code> (Step 3,
+        the pickup prompt &mdash; the high-frequency skill actually in the
+        failure chain). Secondary in
+        <code class="path">claude-skills/wrap/SKILL.md</code> (Step 5,
+        In-Flight).
+      </p>
+      <p>
+        <strong>Hardening (fast-follow, optional):</strong> a tripwire hook
+        mirroring <code>ship-quality-gate.sh</code> &mdash; on write to the
+        pickup prompt / ORCHESTRATOR.md, grep for gating phrases and inject a
+        reminder if found. Crude (false positives on legitimate questions), but
+        it fires by default. Recommend the skill-step baseline now, the hook as
+        a fast-follow once the phrasing rules are settled.
+      </p>
+    </div>
+
+    <h2>5. Cut and demoted</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Disposition</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Consolidate 3 memories into 1</td>
+          <td><span class="pill p-cut">Cut</span></td>
+          <td>
+            Destroys two distinct, still-valid rules; re-installs the rot
+            vector; self-contradicts.
+          </td>
+        </tr>
+        <tr>
+          <td>Git-grep asks-vs-git as primary backstop</td>
+          <td><span class="pill p-reframe">Demoted</span></td>
+          <td>
+            Enumeration is the unsolved half; git-grep gives false confidence.
+            Keep only as an optional best-effort secondary scan.
+          </td>
+        </tr>
+        <tr>
+          <td>Orchestrator-prompt reinforcement pointer</td>
+          <td><span class="pill p-cut">Cut</span></td>
+          <td>
+            Redundant with always-loaded CLAUDE.md; creates a second source that
+            can drift.
+          </td>
+        </tr>
+        <tr>
+          <td>New tracking file</td>
+          <td><span class="pill p-cut">Cut</span></td>
+          <td>
+            The project already had FOLLOW-UPS.md and it rotted. Storage is not
+            the fix.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>6. Acceptance criteria (your own keystone)</h2>
+    <p>
+      Per <code>feedback-evidence-based-done</code>: define done up front, gate
+      on evidence. This fix is done when:
+    </p>
+    <ul>
+      <li>
+        The strawman rule is present in
+        <code class="path">~/.claude/CLAUDE.md</code> &mdash; EVIDENCE: grep
+        output showing the rule.
+      </li>
+      <li>
+        The other two memories are untouched and now linked &mdash; EVIDENCE:
+        diff showing only wikilink additions.
+      </li>
+      <li>
+        <code>wrap-continue</code> Step 3 contains the form-check &mdash;
+        EVIDENCE: the new step text.
+      </li>
+      <li>
+        <strong>Behavioral validation:</strong> run one deliberately-gated test
+        ask through a <code>wrap-continue</code> cycle. Confirm (a) the agent
+        produces a strawman instead of a question, and (b) a planted gated
+        carry-item is flagged "decide or kill." EVIDENCE: the session output for
+        both.
+      </li>
+    </ul>
+
+    <h2>7. Guardrail for whoever implements this</h2>
+    <blockquote class="callout">
+      Before editing any skill file, run
+      <code>readlink ~/.claude/skills/wrap-continue</code> and confirm it
+      resolves into <code>~/Code/claude-skills</code>. The
+      <code>~/Code/agent-skills</code> repo is a stale mirror &mdash; editing it
+      changes nothing. This is the same source-of-truth trap that this plan is
+      partly about.
+    </blockquote>
+
+    <h2>8. Out of scope</h2>
+    <ul>
+      <li>Consolidating or rewriting the other two feedback memories.</li>
+      <li>
+        The tease-capture idea-log review step (same disease, separate small fix
+        scoped earlier this session).
+      </li>
+      <li>
+        Linear visibility (a real concern, but no evidence in this trace;
+        address separately).
+      </li>
+      <li>
+        The 3-way skills drift reconciliation (separate hygiene ticket; the
+        section 7 guardrail prevents it biting this work).
+      </li>
+    </ul>
+
+    <details>
+      <summary>Appendix: the four refuter fronts, verbatim resolution</summary>
+      <p>
+        <strong>Wrong:</strong> consolidation destroys 2 rules (accepted, cut).
+        The "ask first" instinct is shipped, not vague (accepted, reworded as
+        boundary). Git-grep false confidence (accepted, demoted).
+      </p>
+      <p>
+        <strong>Missing:</strong> no forcing function survives (reframed:
+        structural form-check + optional tripwire hook). wrap-continue untreated
+        (accepted, now primary). No form-check on carried items (accepted, it is
+        now Lever 2). No acceptance criteria (accepted, section 6).
+      </p>
+      <p>
+        <strong>Overvalued:</strong> git-grep was the real gold-plating, not the
+        counter (accepted, inverted). Pointer redundant (cut). "Ignore
+        agent-skills" must be an action (accepted, section 7).
+      </p>
+      <p>
+        <strong>Weakest assumption:</strong> "absent not ignored, so global
+        prose fixes it" &mdash; the opposite directive was present and shipped,
+        so prose alone will not reliably win. Resolved by making detection
+        (Lever 2) not depend on prevention (Lever 1) firing.
+      </p>
+    </details>
+  </body>
+</html>
