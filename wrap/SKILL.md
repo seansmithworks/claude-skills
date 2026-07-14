@@ -71,6 +71,13 @@ Save feedback, decisions, or references that future sessions should know about. 
 
 Done before session notes so notes can reference saved memory files. Skip if nothing non-obvious was learned.
 
+**Ledger reconciliation (save open items forward, mark done items complete) — run this regardless of whether new learnings surfaced above; it's not optional.** Walk the thread's task ledger (the harness Task tools) item by item, before the Orchestrator State update in step 6:
+
+- Items that are complete → confirm they're marked completed in the ledger. Don't carry a finished item forward.
+- Items still open / not-done / deferred → save each to the project-root `BACKLOG.md` (create it if absent; append under a dated heading; don't duplicate an item already listed there).
+
+BACKLOG.md is the durable carrier that survives `/clear` and `/compact` — any pickup prompt or compaction summary is lossy and must never be the only record of an open item. Running this before step 6 keeps ORCHESTRATOR.md's In-Flight Work and BACKLOG.md in agreement.
+
 ### 5. Idea-Log Review (tease-capture)
 
 Read `~/.claude/projects/-Users-seansmith-Code/memory/tease-capture.md`.

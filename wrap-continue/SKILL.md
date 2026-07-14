@@ -53,6 +53,15 @@ Save feedback, corrections, or decisions that surfaced this session and aren't y
 
 Skip if nothing non-obvious came up. Don't run full retrospective — that's `/wrap`.
 
+**2a. Ledger reconciliation (save open items forward, mark done items complete) — always runs, independent of whether the rest of Light Capture is skipped.**
+
+Before generating the pickup prompt, walk the thread's task ledger (the harness Task tools) item by item:
+
+- Items that are complete → confirm they're marked completed in the ledger. Don't carry a finished item forward.
+- Items still open / not-done / deferred → save each to the project-root `BACKLOG.md` (create it if absent; append under a dated heading; don't duplicate an item already listed there).
+
+BACKLOG.md is the durable carrier that survives `/clear` and `/compact` — the pickup prompt itself is lossy and must never be the only record of an open item. This feeds 3c below: the items saved to BACKLOG.md here are exactly the carried items that get form-checked before the pickup prompt is written.
+
 ### 3. Hot-Resume Pickup Prompt
 
 Generate a compact pickup prompt the user can paste at the start of the next thread to restore context exactly where work left off.
