@@ -3,7 +3,7 @@ name: wrap-continue
 description: Mid-task context reset — light capture, smart push, hot-resume pickup prompt rendered inline. Use when recycling a long-lived thread to free context while continuing the same work. NOT for end-of-day wrap — use /wrap for that.
 license: MIT
 metadata:
-  version: 0.5.0
+  version: 0.6.0
   category: workflow
   domain: session-management
   status: stable
@@ -60,6 +60,8 @@ Before generating the pickup prompt, walk the thread's task ledger (the harness 
 - Items that are complete → confirm they're marked completed in the ledger. Don't carry a finished item forward.
 - Items still open / not-done / deferred → save each to the project-root `BACKLOG.md` (create it if absent; append under a dated heading; don't duplicate an item already listed there).
 
+**Objective-relevance filter (guards against drift across the reset):** State the thread's locked objective in one line first. Then classify every open item as either *serves-the-objective* or *off-objective* (a leftover from a tangent, or work that belongs to a different objective). Off-objective items go to `BACKLOG.md` and are **excluded from the pickup prompt's "What's next"** — they must never resurface as an active next-step in the next thread. Only objective-serving items are eligible to carry into the pickup prompt. When in doubt whether an item serves the locked objective, park it rather than carry it: a wrongly-parked item is one line to re-add, a wrongly-carried item derails the restart.
+
 BACKLOG.md is the durable carrier that survives `/clear` and `/compact` — the pickup prompt itself is lossy and must never be the only record of an open item. This feeds 3c below: the items saved to BACKLOG.md here are exactly the carried items that get form-checked before the pickup prompt is written.
 
 ### 3. Hot-Resume Pickup Prompt
@@ -70,7 +72,7 @@ The pickup prompt must include:
 
 - **What we're building** — one sentence on the project + task
 - **Where we are** — current status, what just shipped (with commit SHA if applicable)
-- **What's next** — the immediate next action (specific, not vague)
+- **What's next** — the immediate next action (specific, not vague), scoped strictly to the locked objective. Only items that passed the objective-relevance filter in 2a belong here. Off-objective work is not a "next action" — it lives in BACKLOG.md and, if worth mentioning at all, appears only as a one-line "parked in BACKLOG.md" pointer, never as an active step.
 - **Key context** — anything non-obvious that the next thread won't know from the codebase (design decisions, constraints, open questions, gotchas)
 - **Working directory** — the repo path so the next thread can orient immediately
 
@@ -155,6 +157,7 @@ Working directory: ~/Code/[project]
 - **Nothing to push?** Skip push silently. Still commit if anything was uncommitted.
 - **Upstream remote detected?** Skip push with the one-line note. Don't ask.
 - **Big mid-session correction?** Save it as feedback before clearing — future threads will thank you.
+- **Open item that isn't part of this objective?** Park it in BACKLOG.md — do not thread it into the pickup prompt. The hot-resume is for the locked objective only; an unrelated item crossing the reset is the exact drift failure this guards against.
 - **Project has ORCHESTRATOR.md?** Update it — even if this is an implementation thread, not the orchestrator. Any state that changed this session (decisions, conventions, role status, files created) goes in Decision Log or In-Flight Work before context clears.
 - **User seems in a hurry?** Commit + push (if applicable) + pickup prompt only. Skip capture.
 - Keep the whole flow under 5 exchanges. This is speed work, not ceremony.
