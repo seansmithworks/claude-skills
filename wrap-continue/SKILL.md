@@ -64,6 +64,10 @@ Before generating the pickup prompt, walk the thread's task ledger (the harness 
 
 BACKLOG.md is the durable carrier that survives `/clear` and `/compact` — the pickup prompt itself is lossy and must never be the only record of an open item. This feeds 3c below: the items saved to BACKLOG.md here are exactly the carried items that get form-checked before the pickup prompt is written.
 
+### 2b. Project Facts (one-line check)
+
+Did project state change this session (status change, milestone shipped, something postable)? If yes, update the relevant block in `~/.claude/projects/project-facts.md` in place (set `promoted: no` on a new milestone). If no, skip — don't force it.
+
 ### 3. Hot-Resume Pickup Prompt
 
 Generate a compact pickup prompt the user can paste at the start of the next thread to restore context exactly where work left off.

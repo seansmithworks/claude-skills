@@ -93,7 +93,17 @@ This is a review-and-offer step, not an automatic drain. The log spans projects,
 
 Skip if the idea log is empty or all entries were already reviewed in a prior wrap.
 
-### 6. Orchestrator State (any thread in a project that has an ORCHESTRATOR.md)
+### 6. Project Facts (if project state changed)
+
+Ask: did project state change this session? Status change, milestone shipped, or something visual captured worth posting?
+
+If no, skip in one line.
+
+If yes, update the relevant block in `~/.claude/projects/project-facts.md` in place — don't append a duplicate block. Set `promoted: no` on any newly shipped milestone (a new milestone is by definition unpromoted). Create the block if the project isn't in the file yet, matching the existing schema exactly.
+
+This step is cheap by design — one line if nothing changed. Don't let it become a chore.
+
+### 7. Orchestrator State (any thread in a project that has an ORCHESTRATOR.md)
 
 First, check whether `.claude/projects/<path>/memory/ORCHESTRATOR.md` exists for the current project. If it does, this step applies — regardless of whether this thread is the orchestrator or an implementation thread.
 
@@ -118,13 +128,13 @@ Skip ONLY if the project has no ORCHESTRATOR.md, AND no subagents were delegated
 >
 > **Gotcha:** A session that ends cleanly after shipping a milestone still needs ORCHESTRATOR.md updated — clean endings are not an excuse to skip. The skip is only valid for pure-research or pure-chat sessions where nothing changed.
 
-### 7. Session Notes (L2 — if meaningful work happened)
+### 8. Session Notes (L2 — if meaningful work happened)
 
 Append to `docs/SESSION_NOTES.md` if the session produced commits, decisions, or learnings worth recording. Include commit SHAs from step 2, ticket IDs touched from step 3, references to memory files saved in step 4, and any deferred gaps from step 1.
 
 Quick chat sessions or minor tweaks don't need notes.
 
-### 8. Second Brain (L3 — if project state changed significantly)
+### 9. Second Brain (L3 — if project state changed significantly)
 
 Update the project's thread in Second Brain with current state, what's next, open questions. Use `/secondbrain` or QMD to find/update the thread. This is the narrative arc — summarize the session notes from step 7, don't duplicate them.
 
@@ -135,9 +145,9 @@ Skip for small sessions that don't change the project's trajectory.
 - **Coding-only projects** → Session Notes (git-searchable, co-located with code)
 - **Cross-domain or life projects** → Second Brain thread (QMD-searchable, broader context)
 
-### 9. Final Commit & Push (if steps above created docs)
+### 10. Final Commit & Push (if steps above created docs)
 
-Commit any session notes, memory updates, orchestrator state, or Second Brain changes created in steps 4–8. Push. Separate commit from step 2 so code and documentation commits are distinct in history.
+Commit any session notes, memory updates, project facts, orchestrator state, or Second Brain changes created in steps 4–9. Push. Separate commit from step 2 so code and documentation commits are distinct in history.
 
 ## Output Format
 
