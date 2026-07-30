@@ -3,7 +3,7 @@ name: wrap-continue
 description: Mid-task context reset — light capture, smart push, hot-resume pickup prompt rendered inline. Use when recycling a long-lived thread to free context while continuing the same work. NOT for end-of-day wrap — use /wrap for that.
 license: MIT
 metadata:
-  version: 0.6.0
+  version: 0.7.0
   category: workflow
   domain: session-management
   status: stable
@@ -97,6 +97,16 @@ For any item carried forward again (not resolved since the last wrap-continue), 
 
 The goal: no gated item should quietly survive another cycle as a question. Either it becomes a strawman or it becomes an explicit decision point.
 
+**3d. Thread name carry-forward.** Read the current session's user-set name:
+
+```bash
+jq -r '[.nameSource, .name] | @tsv' ~/.claude/sessions/$CLAUDE_PID.json 2>/dev/null
+```
+
+If `nameSource` is `user`, the name is meaningful and carries forward. If it's `derived` or `auto`, or the file/`jq` is unavailable, skip silently — a machine-generated slug like `code-55` carries no signal and must not be surfaced.
+
+When a user-set name exists, do two things: add `Thread: <name>` as the first line inside the pickup prompt, so the next thread knows the working title even if Sean never renames it; and emit a `/rename "<name>"` line outside and below the fenced pickup-prompt block (see Output Format). The `/rename` line lives outside the fence because `/rename` is a built-in CLI command that only fires when it is the entire message — a paste that begins with it would land as literal text. It must be typed separately, not pasted as part of the prompt.
+
 ```bash
 cat <<'EOF' | pbcopy
 [prompt content here]
@@ -119,8 +129,11 @@ If `pbcopy` is unavailable (non-macOS), skip silently — add a note in the stat
   │ Capture  │ 1 feedback saved / skipped                   │
   │ Clipboard│ Copied to clipboard                          │
   │ Repo     │ Clean, up to date with origin                │
+  │ Thread   │ adyen-case-study — carried forward           │
   └──────────┴──────────────────────────────────────────────┘
 ```
+
+The `Thread` row is omitted entirely when there is no user-set name to carry.
 
 Then the wrapped-present, cut-lines, and the pickup prompt rendered inline:
 
@@ -142,6 +155,7 @@ Then the wrapped-present, cut-lines, and the pickup prompt rendered inline:
 ```
 ## Pickup prompt (paste at start of next thread)
 
+Thread: [name]
 [project + task context]
 [current status + last commit SHA]
 [immediate next action]
@@ -155,6 +169,8 @@ Working directory: ~/Code/[project]
 
 **Pickup prompt is on your clipboard.** Paste it at the start of the next thread.
 
+**Thread name:** type `/rename "adyen-case-study"` in the new thread (or launch it as `claude -n "adyen-case-study"`). Omitted entirely when there is no user-set name.
+
 ## Judgment Calls
 
 - **Nothing uncommitted?** Still generate the pickup prompt — that's the whole point.
@@ -164,6 +180,7 @@ Working directory: ~/Code/[project]
 - **Open item that isn't part of this objective?** Park it in BACKLOG.md — do not thread it into the pickup prompt. The hot-resume is for the locked objective only; an unrelated item crossing the reset is the exact drift failure this guards against.
 - **Project has ORCHESTRATOR.md?** Update it — even if this is an implementation thread, not the orchestrator. Any state that changed this session (decisions, conventions, role status, files created) goes in Decision Log or In-Flight Work before context clears.
 - **User seems in a hurry?** Commit + push (if applicable) + pickup prompt only. Skip capture.
+- **Session name is `derived`/`auto`, or the sessions file is missing?** Skip the whole thread-name carry-forward step silently — never surface a machine-generated slug.
 - Keep the whole flow under 5 exchanges. This is speed work, not ceremony.
 
 ## Future Setup Path (deferred)
