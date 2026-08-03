@@ -35,6 +35,16 @@ Suggests what's worth saving before closing. Every step is optional — assess w
 
 The sequence follows the Information Lifecycle (L1 → L2 → L3): reconcile first (orchestrator threads only), then code so commits have SHAs, then hot memory, then the session log, then long-term threads. Each layer references the one below it.
 
+### 0. Stop in-flight background agents (runs FIRST, before reconciliation or commits)
+
+Background agents do not survive the session ending, and they keep writing files while you wrap. Stopping them after you commit makes the commit stale and any "clean tree" claim false.
+
+- List anything still running (`TaskList`, plus background Bash tasks this session launched) and stop each with `TaskStop`. Leave dev servers up, but note port and PID.
+- **Re-check `git status` in every worktree those agents touched afterwards** — a killed agent routinely leaves partial, unverified work behind.
+- For each stopped agent, record what it was doing, whether it committed, and whether it left uncommitted work. Partial work gets committed on a labelled branch or named explicitly in the notes as unverified — never left silent.
+
+If nothing is running, one line and move on.
+
 ### 1. Plan Reconciliation (orchestrator threads only)
 
 Verify every subagent delegated this session delivered what was asked. Run BEFORE commits — the reconciliation result shapes everything downstream.

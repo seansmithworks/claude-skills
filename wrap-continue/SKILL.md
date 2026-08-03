@@ -29,6 +29,19 @@ If the session is actually done for the day, use `/wrap` instead — that runs f
 
 ## Steps
 
+### 0. Stop in-flight background agents (runs FIRST, before anything else)
+
+Background agents and background shells do not survive the context reset, and they keep writing files while you wrap. If you commit before stopping them, your commit is stale and your "nothing uncommitted" claim is false the moment they die mid-write.
+
+- List anything still running (`TaskList`, plus any background Bash tasks this session launched).
+- Stop each one with `TaskStop`. Dev servers are the exception — leave those running, they are useful to the next thread, but note the port and PID so it does not try to start a second one.
+- **Then re-check `git status` in every worktree the agents touched.** A killed agent routinely leaves partial, unverified, uncommitted work. Do not assume the tree matches what you saw before the kill.
+- For each stopped agent, state in the wrap output: what it was doing, whether it had committed anything, and whether it left uncommitted work behind. Partial work is either committed on a clearly-labelled branch or explicitly named in the pickup prompt as unverified — never left silent.
+
+If nothing is running, say so in one line and move on.
+
+_Why this is step 0: the ordering is the whole point. Stop → re-check → commit. Reversing it produced exactly this bug once — a wrap reported a clean tree, the agents were killed afterwards, and a half-built route was left uncommitted under a stale "nothing is uncommitted anywhere" claim._
+
 ### 1. Commit & Push (mandatory commit, smart push)
 
 Check `git status`. Everything uncommitted is at risk when context clears. Commit all meaningful changes now — this is not optional.
@@ -125,6 +138,7 @@ If `pbcopy` is unavailable (non-macOS), skip silently — add a note in the stat
   ╰─────────────────────────────────────────────────────────╯
 
   ┌──────────┬──────────────────────────────────────────────┐
+  │ Agents   │ 2 stopped — 1 left uncommitted work          │
   │ Git      │ 2 commits — pushed to origin (abc1234)       │
   │ Capture  │ 1 feedback saved / skipped                   │
   │ Clipboard│ Copied to clipboard                          │
