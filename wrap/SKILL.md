@@ -43,12 +43,15 @@ Match what's already in each file: edit the existing entry rather than appending
 | Content | Home |
 |---|---|
 | Open / deferred / unfinished items | project-root `BACKLOG.md` (create if absent) |
-| Running project context, decisions, in-flight work | `.claude/projects/<escaped-path>/memory/ORCHESTRATOR.md` |
-| Durable learnings, corrections, gotchas | a named file in the same `memory/` dir, indexed in its `MEMORY.md` |
+| Current project state and pointers to it | `.claude/projects/<escaped-path>/memory/ORCHESTRATOR.md` — state and links only, never the durable fact itself |
+| Durable decisions, learnings, corrections, gotchas, in-flight-work detail | a named file in the same `memory/` dir (`agent-*.md`, `reference_*`, `feedback_*`), indexed in its `MEMORY.md`, linked from `ORCHESTRATOR.md` by `[[wikilink]]` |
+| Superseded `ORCHESTRATOR.md` content (prior PICKUP block, closed items) | `.claude/projects/<escaped-path>/memory/ORCHESTRATOR-log.md` |
 | Cross-project status | `~/.claude/projects/project-facts.md` — edit the existing block; new blocks follow the schema at the top of that file, including default flags (a freshly shipped milestone is `promoted: no`) |
 | Deferred-intent log | `~/.claude/projects/-Users-seansmith-Code/memory/tease-capture.md` — its own 30-day prune rule is documented inside it |
 | Session narrative | the repo's existing notes location for code projects, **or** the project's Second Brain thread for cross-domain/life projects — one, never both |
 | Tickets | Linear via `mcp__claude_ai_Linear__save_issue`, if the project tracks tickets |
+
+Session-scoped facts never enter a cross-session file at all — not `ORCHESTRATOR.md`, not a memory file. Test before writing a line into either: would a fresh thread that never reads this line do something wrong because of it? A PID, a port, "the MCP was down this session" — none of these are evaluable later, so none of them get written, even as a status update.
 
 Stage by explicit path. `git add -A` sweeps another session's edits when two threads share a tree.
 
@@ -66,6 +69,12 @@ Run what the session earned. Steps 0 and 4 are the load-bearing ones.
 5. **Learnings.** Only non-obvious ones — corrections, decisions, conventions, gotchas that cost real time. Nothing re-derivable from the code or the git log. Write once, index it.
 6. **Deferred-intent review.** Show what has accumulated in `tease-capture.md` since it was last reviewed. Then offer, separately and one at a time: pruning entries past the file's age rule (name them), and promoting any entry that is a genuine actionable spike. Nothing deleted or promoted automatically. Skip if empty or already reviewed.
 7. **Shared state.** Where the project has `ORCHESTRATOR.md`, updating it is **mandatory** if *any* of these are true: a subagent was delegated (success or failure), an architectural decision was made, in-flight work was added or completed, step 1 deferred a gap, the session produced commits, or project state changed in a way another thread would need. Skippable only when the file doesn't exist, or when *none* of those hold. Being an implementation thread rather than the orchestrator is not an excuse; neither is a clean ending.
+
+   The update is not complete until something has been evicted, or you've confirmed nothing is stale and said so. Eviction, not addition, is the point of touching this file:
+   - **PICKUP holds one block — the current one.** Writing a new block means the prior block moves to `ORCHESTRATOR-log.md` in the same edit, not alongside it.
+   - **In-Flight holds genuinely open work only,** each item compressed to status + next action + pointer — not restated prose.
+   - **Fragile Areas is the target shape for anything trap-like:** one line, a `[[wikilink]]` to the file that owns the full text, nothing restated in `ORCHESTRATOR.md` itself.
+   - **Durable traps route to the file that owns them, never to `-log.md`.** Archiving a permanently-true fact is how it stops protecting anyone; `-log.md` is for what has actually closed or been superseded, not for things that are still true but merely old.
 8. **Session record.** Ties the session to its real artifacts: commits made, tickets touched, memory files saved, gaps deferred and where they went. Skip for a session that produced none of those — an empty note committed to look thorough is worse than no note.
 9. **Docs commit.** Everything steps 4–8 wrote gets its own commit, separate from the code commit, so documentation and code history stay distinguishable. Then offer the push (rule 2). Documentation left uncommitted is the wrap failing at its own job.
 
@@ -78,7 +87,7 @@ Run what the session earned. Steps 0 and 4 are the load-bearing ones.
 
 ## Size ceilings
 
-Files that load automatically into every future session (`MEMORY.md`, `ORCHESTRATOR.md`, `CLAUDE.md`) stay in the low hundreds of lines. Keeping one current means cutting what has gone stale, not only appending what is new. If one is over, say so in the close-out and offer a specific prune naming the sections — never delete on your own authority. Leaving an oversized always-read file unmentioned is a miss.
+Files that load automatically into every future session (`MEMORY.md`, `ORCHESTRATOR.md`, `CLAUDE.md`) cap at **20,000 characters, measured with `wc -c` — never in lines.** A line count hides real growth here: these files are written in paragraphs, so a file that blows the char cap 5x over can still read as "a few hundred lines." Keeping one current means cutting what has gone stale, not only appending what is new. If one is over, say so in the close-out and offer a specific prune naming the sections — never delete on your own authority. Leaving an oversized always-read file unmentioned is a miss.
 
 ## Proportion
 
