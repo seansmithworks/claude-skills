@@ -103,7 +103,34 @@ A skipped step is a correct outcome. A skipped step that vanishes from the close
 
 ## The close-out
 
-Default to bullets, not paragraphs. **No ASCII banner, no boxed status table, no per-step checklist** — decoration and ceremony cost the read, and this is the one moment to be brief. Length scales with the session: two to five lines when little happened; for a heavy session, a short labelled list, one line per area, ~15 lines at the outside. 150–350 words is the target range per `~/.claude/BREVITY.md` — over range means reorder, deduplicate, or demote, never cut something load-bearing.
+```
+                                               _____
+                                              |     |
+  ╭───────────────────────────────────────────[_____]───────────────────────────────────────────╮
+  │                             ┌────────────────────────────────────────────────────────────┐  │
+  │                             │                                                            │  │
+  │   · · · · · · · · · · · ·   │                                                            │  │
+  │   · · · · · · · · · · · ·   │               ________ ______ _______ ______               │  │
+  │  · ◉ ◉ ◉ ◉ ◉ ◉ ◉ ◉ ◉ ◉ ◉ ·  │              |  |  |  |   __ \   _   |   __ \              │  │
+  │  ·◉ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ◉·  │              |  |  |  |      <       |    __/              │  │
+  │  ·◉ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ◉·  │              |________|___|__|___|___|___|                 │  │
+  │  ·◉ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ◉·  │                                                            │  │
+  │  ·◉ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ◉·  │                      _______ _______                       │  │
+  │  ·◉ ○ ○ ○ ○ ○ ● ○ ○ ○ ○ ◉·  │                     |_     _|_     _|                      │  │
+  │  ·◉ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ◉·  │                      _|   |_  |   |                        │  │
+  │  ·◉ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ◉·  │                     |_______| |___|                        │  │
+  │  ·◉ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ◉·  │                                                            │  │
+  │  ·◉ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ◉·  │                       _______ ______                       │  │
+  │  · ◉ ◉ ◉ ◉ ◉ ◉ ◉ ◉ ◉ ◉ ◉ ·  │                      |   |   |   __ \                      │  │
+  │   · · · · · · · · · · · ·   │                      |   |   |    __/                      │  │
+  │   · · · · · · · · · · · ·   │                      |_______|___|                         │  │
+  │                             │                                                            │  │
+  │                             │                                                            │  │
+  │                             └────────────────────────────────────────────────────────────┘  │
+  ╰─────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+Default to bullets, not paragraphs. **The banner above always leads the close-out** — it is a marker, not content, and does not count against the word target below. **No boxed status table, no per-step checklist** — those restate the close-out itself, and that repetition costs the read. Length scales with the session: two to five lines when little happened; for a heavy session, a short labelled list, one line per area, ~15 lines at the outside. 150–350 words is the target range per `~/.claude/BREVITY.md` — over range means reorder, deduplicate, or demote, never cut something load-bearing.
 
 Lead with the thing Sean most needs to know — a gap, a broken state, a decision waiting on him — not a chronology.
 
