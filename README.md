@@ -1,3 +1,12 @@
+> **This repo is archived. These skills moved to [seansmithworks/agent-skills](https://github.com/seansmithworks/agent-skills).**
+>
+> Install any of them directly:
+>
+> ```bash
+> npx skills add seansmithworks/agent-skills --list
+> npx skills add seansmithworks/agent-skills --skill wrap
+> ```
+
 # claude-skills
 
 A collection of Claude Code skills for managing AI-assisted development workflows.
@@ -48,23 +57,11 @@ Reviews and applies pending updates to the orchestrator's config. Runs before/af
 
 ## Installation
 
-Clone the repo anywhere, then symlink the skills you want into `~/.claude/skills/`:
-
-```bash
-git clone https://github.com/SeanSmithDesign/claude-skills.git /path/to/claude-skills
-
-mkdir -p ~/.claude/skills
-ln -s /path/to/claude-skills/wrap ~/.claude/skills/wrap
-ln -s /path/to/claude-skills/wrap-continue ~/.claude/skills/wrap-continue
-ln -s /path/to/claude-skills/orchestrator-scaffold ~/.claude/skills/orchestrator-scaffold
-ln -s /path/to/claude-skills/orchestrator-update ~/.claude/skills/orchestrator-update
-```
-
-Replace `/path/to/claude-skills` with wherever you cloned the repo (e.g. `~/claude-skills`, `~/projects/claude-skills`, etc.).
+Use the `npx skills add seansmithworks/agent-skills` commands above to install any skill directly.
 
 ## Context
 
-These skills are part of the [Orchestrator pattern](https://github.com/SeanSmithDesign/claude-skills) — a long-lived Claude Code thread that learns your codebase, maintains context, and delegates implementation to subagents. The `orchestrator-scaffold` and `orchestrator-update` skills support that workflow.
+These skills are part of the [Orchestrator pattern](https://github.com/seansmithworks/claude-skills) — a long-lived Claude Code thread that learns your codebase, maintains context, and delegates implementation to subagents. The `orchestrator-scaffold` and `orchestrator-update` skills support that workflow.
 
 `wrap` and `wrap-continue` are session management utilities usable independently of the Orchestrator pattern.
 
