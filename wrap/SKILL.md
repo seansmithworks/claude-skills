@@ -59,6 +59,8 @@ Stage by explicit path. `git add -A` sweeps another session's edits when two thr
 
 ## The pass
 
+Read `~/.claude/BREVITY.md` before writing any notes or close-out prose — it sets the 300-word budget and structure rules the session record and close-out below must follow.
+
 Run what the session earned. Steps 0 and 4 are the load-bearing ones.
 
 0. **Freeze.** Rule 1. One line if nothing was running.
@@ -101,7 +103,7 @@ A skipped step is a correct outcome. A skipped step that vanishes from the close
 
 ## The close-out
 
-Plain prose. **No ASCII banner, no boxed status table, no per-step checklist** — decoration and ceremony cost the read, and this is the one moment to be brief. Length scales with the session: two to five lines when little happened; for a heavy session, a short labelled list, one line per area, ~15 lines at the outside.
+Plain prose. **No ASCII banner, no boxed status table, no per-step checklist** — decoration and ceremony cost the read, and this is the one moment to be brief. Length scales with the session: two to five lines when little happened; for a heavy session, a short labelled list, one line per area, ~15 lines at the outside. 300 words is the hard ceiling per `~/.claude/BREVITY.md` — cut scope to fit it, never shrink formatting to cheat it.
 
 Lead with the thing Sean most needs to know — a gap, a broken state, a decision waiting on him — not a chronology.
 
